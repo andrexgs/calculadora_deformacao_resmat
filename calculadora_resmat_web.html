@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora ResMat</title>
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --purple: #4f46e5;
+      --green: #16a34a;
+      --result-bg: #111827;
+      --result: #22c55e;
+      --warn-bg: #fffbeb;
+      --warn-border: #fde68a;
+      --warn-text: #92400e;
+      --error-bg: #fef2f2;
+      --error-border: #fecaca;
+      --error-text: #b91c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .title {
+      margin: 8px 0 6px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .status {
+      color: white;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      background: var(--purple);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field input:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.25);
+    }
+
+    .hint {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .error {
+      display: none;
+      margin-top: 8px;
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+      color: var(--error-text);
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .result {
+      margin-top: 20px;
+      background: var(--result-bg);
+      border-radius: 16px;
+      padding: 22px;
+      text-align: center;
+    }
+
+    .result-label {
+      color: #9ca3af;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .result-value {
+      color: var(--result);
+      font-size: 2rem;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--purple);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .info {
+      margin-top: 20px;
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .info h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      color: var(--warn-text);
+    }
+
+    .info ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--warn-text);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 18px;
+      font-size: 0.85rem;
+    }
+
+    @media (min-width: 680px) {
+      .grid.two {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="title">Calculadora ResMat</h1>
+    <p class="subtitle">Deformação axial pela fórmula δ = P·L / (E·A)</p>
+
+    <section class="card">
+      <div id="status" class="status">Sistema ativo: cm / cm² / N</div>
+
+      <div class="grid two">
+        <div class="field">
+          <label for="p">Carga P</label>
+          <input id="p" type="text" placeholder="Ex.: 10k, 500, 2M" />
+          <div class="hint">Aceita prefixos SI como k, M, G, m, μ, da.</div>
+        </div>
+
+        <div class="field">
+          <label for="e">Módulo E</label>
+          <input id="e" type="text" placeholder="Ex.: 210G" />
+          <div class="hint">Exemplo comum para aço: 210G</div>
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-top: 2px;">
+        <div class="field">
+          <label for="l" id="labelL">Comprimento L (cm)</label>
+          <input id="l" type="number" step="any" placeholder="Ex.: 150" />
+          <div class="hint" id="hintL">Informe L em cm</div>
+        </div>
+
+        <div class="field">
+          <label for="a" id="labelA">Área A (cm²)</label>
+          <input id="a" type="number" step="any" placeholder="Ex.: 25" />
+          <div class="hint" id="hintA">Informe A em cm²</div>
+        </div>
+      </div>
+
+      <div id="error" class="error"></div>
+
+      <div class="result">
+        <div class="result-label">Deformação (δ)</div>
+        <div id="result" class="result-value">...</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" id="copyBtn">Copiar resultado</button>
+        <button class="btn-secondary" id="clearBtn">Limpar</button>
+      </div>
+    </section>
+
+    <section class="info">
+      <h2>Observações</h2>
+      <ul>
+        <li><strong>m</strong> (mili) é diferente de <strong>M</strong> (mega).</li>
+        <li>Apenas <strong>k</strong> minúsculo na carga ativa o sistema em <strong>mm / mm² / kN</strong>.</li>
+        <li>O resultado final é sempre exibido em <strong>mm</strong>.</li>
+        <li>Você pode usar vírgula ou ponto decimal.</li>
+      </ul>
+    </section>
+
+    <p class="footer">Pronto para subir no GitHub como site estático.</p>
+  </main>
+
+  <script>
+    const PREFIX_FACTORS = {
+      Y: 1e24,
+      Z: 1e21,
+      E: 1e18,
+      P: 1e15,
+      T: 1e12,
+      G: 1e9,
+      M: 1e6,
+      k: 1e3,
+      h: 1e2,
+      da: 1e1,
+      d: 1e-1,
+      c: 1e-2,
+      m: 1e-3,
+      u: 1e-6,
+      μ: 1e-6,
+      n: 1e-9,
+      p: 1e-12,
+      f: 1e-15,
+      a: 1e-18,
+      z: 1e-21,
+      y: 1e-24
+    };
+
+    const els = {
+      p: document.getElementById('p'),
+      l: document.getElementById('l'),
+      e: document.getElementById('e'),
+      a: document.getElementById('a'),
+      status: document.getElementById('status'),
+      labelL: document.getElementById('labelL'),
+      labelA: document.getElementById('labelA'),
+      hintL: document.getElementById('hintL'),
+      hintA: document.getElementById('hintA'),
+      error: document.getElementById('error'),
+      result: document.getElementById('result'),
+      clearBtn: document.getElementById('clearBtn'),
+      copyBtn: document.getElementById('copyBtn')
+    };
+
+    function parseWithPrefix(input) {
+      if (!input || !input.trim()) {
+        return { value: NaN, prefix: '', raw: '' };
+      }
+
+      const normalized = input.trim().replace(',', '.').replace(/\s+/g, '');
+      const match = normalized.match(/^([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(da|[YZEPTGMkhdcmuμnpfazy])?$/);
+
+      if (!match) {
+        return { value: NaN, prefix: '', raw: normalized };
+      }
+
+      const numericPart = Number(match[1]);
+      const suffix = match[2] || '';
+      const factor = suffix === '' ? 1 : PREFIX_FACTORS[suffix];
+
+      if (Number.isNaN(numericPart) || factor === undefined) {
+        return { value: NaN, prefix: suffix, raw: normalized };
+      }
+
+      return {
+        value: numericPart * factor,
+        prefix: suffix,
+        raw: normalized
+      };
+    }
+
+    function parsePlainNumber(input) {
+      if (!input || !input.trim()) return NaN;
+      return Number(input.trim().replace(',', '.'));
+    }
+
+    function detectSystem(loadPrefix) {
+      return loadPrefix === 'k' ? 'mm' : 'cm';
+    }
+
+    function setError(message) {
+      if (message) {
+        els.error.textContent = message;
+        els.error.style.display = 'block';
+      } else {
+        els.error.textContent = '';
+        els.error.style.display = 'none';
+      }
+    }
+
+    function updateUIForSystem(system) {
+      const isMm = system === 'mm';
+      els.status.textContent = isMm
+        ? 'Sistema ativo: mm / mm² / kN'
+        : 'Sistema ativo: cm / cm² / N';
+      els.status.style.background = isMm ? '#16a34a' : '#4f46e5';
+      els.labelL.textContent = `Comprimento L (${isMm ? 'mm' : 'cm'})`;
+      els.labelA.textContent = `Área A (${isMm ? 'mm²' : 'cm²'})`;
+      els.hintL.textContent = `Informe L em ${isMm ? 'mm' : 'cm'}`;
+      els.hintA.textContent = `Informe A em ${isMm ? 'mm²' : 'cm²'}`;
+      els.l.placeholder = isMm ? 'Ex.: 1500' : 'Ex.: 150';
+      els.a.placeholder = isMm ? 'Ex.: 250' : 'Ex.: 25';
+    }
+
+    function calculate() {
+      const parsedP = parseWithPrefix(els.p.value);
+      const parsedE = parseWithPrefix(els.e.value);
+      const valL = parsePlainNumber(els.l.value);
+      const valA = parsePlainNumber(els.a.value);
+      const system = detectSystem(parsedP.prefix);
+
+      updateUIForSystem(system);
+
+      if (!els.p.value && !els.l.value && !els.e.value && !els.a.value) {
+        setError('');
+        els.result.textContent = '...';
+        return;
+      }
+
+      if (Number.isNaN(parsedP.value)) {
+        setError('Carga inválida. Ex.: 10k, 500, 2M');
+        els.result.textContent = '...';
+        return;
+      }
+
+      if (Number.isNaN(valL) || valL <= 0) {
+        setError(`Comprimento L inválido em ${system === 'mm' ? 'mm' : 'cm'}.`);
+        els.result.textContent = '...';
+        return;
+      }
+
+      if (Number.isNaN(parsedE.value) || parsedE.value <= 0) {
+        setError('Módulo E inválido. Ex.: 210G');
+        els.result.textContent = '...';
+        return;
+      }
+
+      if (Number.isNaN(valA) || valA <= 0) {
+        setError(`Área A inválida em ${system === 'mm' ? 'mm²' : 'cm²'}.`);
+        els.result.textContent = '...';
+        return;
+      }
+
+      setError('');
+
+      const L_SI = system === 'mm' ? valL * 1e-3 : valL * 1e-2;
+      const A_SI = system === 'mm' ? valA * 1e-6 : valA * 1e-4;
+      const deltaMeters = (parsedP.value * L_SI) / (parsedE.value * A_SI);
+      const deltaMm = deltaMeters * 1000;
+
+      els.result.textContent = `${deltaMm.toFixed(6)} mm`;
+    }
+
+    [els.p, els.l, els.e, els.a].forEach((input) => {
+      input.addEventListener('input', calculate);
+    });
+
+    els.clearBtn.addEventListener('click', () => {
+      els.p.value = '';
+      els.l.value = '';
+      els.e.value = '';
+      els.a.value = '';
+      calculate();
+      els.p.focus();
+    });
+
+    els.copyBtn.addEventListener('click', async () => {
+      const text = els.result.textContent;
+      if (!text || text === '...') return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        const original = els.copyBtn.textContent;
+        els.copyBtn.textContent = 'Resultado copiado';
+        setTimeout(() => {
+          els.copyBtn.textContent = original;
+        }, 1600);
+      } catch {
+        const original = els.copyBtn.textContent;
+        els.copyBtn.textContent = 'Não foi possível copiar';
+        setTimeout(() => {
+          els.copyBtn.textContent = original;
+        }, 1600);
+      }
+    });
+
+    calculate();
+  </script>
+</body>
+</html>

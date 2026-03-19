@@ -85,6 +85,12 @@
       font-size: 0.95rem;
     }
 
+    .input-with-unit {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .field input {
       width: 100%;
       border: 1px solid var(--border);
@@ -99,6 +105,19 @@
     .field input:focus {
       border-color: #93c5fd;
       box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.25);
+    }
+
+    .unit-badge {
+      min-width: 64px;
+      text-align: center;
+      border: 1px solid var(--border);
+      background: #eef2ff;
+      color: #3730a3;
+      border-radius: 12px;
+      padding: 12px 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
     .hint {
@@ -208,33 +227,45 @@
     <p class="subtitle">Deformação axial pela fórmula δ = P·L / (E·A)</p>
 
     <section class="card">
-      <div id="status" class="status">Sistema ativo: cm / cm² / N</div>
+      <div id="status" class="status">Sistema ativo: mm / mm² / kN</div>
 
       <div class="grid two">
         <div class="field">
           <label for="p">Carga P</label>
-          <input id="p" type="text" placeholder="Ex.: 10k, 500, 2M" />
+          <div class="input-with-unit">
+            <input id="p" type="text" value="10k" placeholder="Ex.: 10k, 500, 2M" />
+            <span id="unitP" class="unit-badge">kN</span>
+          </div>
           <div class="hint">Aceita prefixos SI como k, M, G, m, μ, da.</div>
         </div>
 
         <div class="field">
           <label for="e">Módulo E</label>
-          <input id="e" type="text" placeholder="Ex.: 210G" />
+          <div class="input-with-unit">
+            <input id="e" type="text" value="210G" placeholder="Ex.: 210G" />
+            <span id="unitE" class="unit-badge">Pa</span>
+          </div>
           <div class="hint">Aceita prefixos SI como k, M, G, m, μ, da.</div>
         </div>
       </div>
 
       <div class="grid two" style="margin-top: 2px;">
         <div class="field">
-          <label for="l" id="labelL">Comprimento L (cm)</label>
-          <input id="l" type="number" step="any" placeholder="Ex.: 150" />
-          <div class="hint" id="hintL">Informe L em cm</div>
+          <label for="l" id="labelL">Comprimento L</label>
+          <div class="input-with-unit">
+            <input id="l" type="number" step="any" value="150" placeholder="Ex.: 150" />
+            <span id="unitL" class="unit-badge">mm</span>
+          </div>
+          <div class="hint" id="hintL">Informe L em mm</div>
         </div>
 
         <div class="field">
-          <label for="a" id="labelA">Área A (cm²)</label>
-          <input id="a" type="number" step="any" placeholder="Ex.: 25" />
-          <div class="hint" id="hintA">Informe A em cm²</div>
+          <label for="a" id="labelA">Área A</label>
+          <div class="input-with-unit">
+            <input id="a" type="number" step="any" value="25" placeholder="Ex.: 25" />
+            <span id="unitA" class="unit-badge">mm²</span>
+          </div>
+          <div class="hint" id="hintA">Informe A em mm²</div>
         </div>
       </div>
 
@@ -300,6 +331,10 @@
       labelA: document.getElementById('labelA'),
       hintL: document.getElementById('hintL'),
       hintA: document.getElementById('hintA'),
+      unitP: document.getElementById('unitP'),
+      unitE: document.getElementById('unitE'),
+      unitL: document.getElementById('unitL'),
+      unitA: document.getElementById('unitA'),
       error: document.getElementById('error'),
       result: document.getElementById('result'),
       clearBtn: document.getElementById('clearBtn'),
@@ -352,20 +387,6 @@
       }
     }
 
-    function updateUIForSystem(system) {
-      const isMm = system === 'mm';
-      els.status.textContent = isMm
-        ? 'Sistema ativo: mm / mm² / kN'
-        : 'Sistema ativo: cm / cm² / N';
-      els.status.style.background = isMm ? '#16a34a' : '#4f46e5';
-      els.labelL.textContent = `Comprimento L (${isMm ? 'mm' : 'cm'})`;
-      els.labelA.textContent = `Área A (${isMm ? 'mm²' : 'cm²'})`;
-      els.hintL.textContent = `Informe L em ${isMm ? 'mm' : 'cm'}`;
-      els.hintA.textContent = `Informe A em ${isMm ? 'mm²' : 'cm²'}`;
-      els.l.placeholder = isMm ? 'Ex.: 1500' : 'Ex.: 150';
-      els.a.placeholder = isMm ? 'Ex.: 250' : 'Ex.: 25';
-    }
-
     function formatNumberBR(value) {
       return value
         .toFixed(12)
@@ -387,6 +408,30 @@
         prefix: '',
         raw: inputEl.value
       };
+    }
+
+    function updateUIForSystem(system) {
+      const isMm = system === 'mm';
+
+      els.status.textContent = isMm
+        ? 'Sistema ativo: mm / mm² / kN'
+        : 'Sistema ativo: cm / cm² / N';
+
+      els.status.style.background = isMm ? '#16a34a' : '#4f46e5';
+
+      els.labelL.textContent = 'Comprimento L';
+      els.labelA.textContent = 'Área A';
+
+      els.hintL.textContent = `Informe L em ${isMm ? 'mm' : 'cm'}`;
+      els.hintA.textContent = `Informe A em ${isMm ? 'mm²' : 'cm²'}`;
+
+      els.l.placeholder = isMm ? 'Ex.: 1500' : 'Ex.: 150';
+      els.a.placeholder = isMm ? 'Ex.: 250' : 'Ex.: 25';
+
+      els.unitP.textContent = isMm ? 'kN' : 'N';
+      els.unitE.textContent = 'Pa';
+      els.unitL.textContent = isMm ? 'mm' : 'cm';
+      els.unitA.textContent = isMm ? 'mm²' : 'cm²';
     }
 
     function calculate() {
@@ -452,10 +497,10 @@
     });
 
     els.clearBtn.addEventListener('click', () => {
-      els.p.value = '';
-      els.l.value = '';
-      els.e.value = '';
-      els.a.value = '';
+      els.p.value = '10k';
+      els.e.value = '210G';
+      els.l.value = '150';
+      els.a.value = '25';
       calculate();
       els.p.focus();
     });

@@ -220,7 +220,7 @@
         <div class="field">
           <label for="e">Módulo E</label>
           <input id="e" type="text" placeholder="Ex.: 210G" />
-          <div class="hint">Exemplo comum para aço: 210G</div>
+          <div class="hint">Aceita prefixos SI como k, M, G, m, μ, da.</div>
         </div>
       </div>
 
@@ -258,6 +258,7 @@
         <li>Apenas <strong>k</strong> minúsculo na carga ativa o sistema em <strong>mm / mm² / kN</strong>.</li>
         <li>O resultado final é sempre exibido em <strong>mm</strong>.</li>
         <li>Você pode usar vírgula ou ponto decimal.</li>
+        <li>Ao sair do campo <strong>P</strong> ou <strong>E</strong>, valores com prefixo são convertidos automaticamente.</li>
       </ul>
     </section>
 
@@ -322,7 +323,7 @@
       const factor = suffix === '' ? 1 : PREFIX_FACTORS[suffix];
 
       if (Number.isNaN(numericPart) || factor === undefined) {
-        return { value: NaN, prefix: suffix, raw: normalized };
+        return { value: NaN, prefix: '', raw: normalized };
       }
 
       return {
@@ -365,85 +366,35 @@
       els.a.placeholder = isMm ? 'Ex.: 250' : 'Ex.: 25';
     }
 
-    function parseElasticModulus(input, system) {
-      if (!input || !input.trim()) {
-        return { value: NaN, raw: '' };
+    function formatNumberBR(value) {
+      return value
+        .toFixed(12)
+        .replace(/\.?0+$/, '')
+        .replace('.', ',');
+    }
+
+    function normalizeInputValue(inputEl) {
+      const parsed = parseWithPrefix(inputEl.value);
+
+      if (!inputEl.value || Number.isNaN(parsed.value) || !parsed.prefix) {
+        return parsed;
       }
 
-      const normalized = input
-        .trim()
-        .replace(',', '.')
-        .replace(/\s+/g, '')
-        .replace('²', '2');
+      inputEl.value = formatNumberBR(parsed.value);
 
-      const match = normalized.match(/^([+-]?\d*\.?\d+(?:e[+-]?\d+)?)([a-zA-Zμ\/0-9]*)$/);
-
-      if (!match) {
-        return { value: NaN, raw: normalized };
-      }
-
-      const numericPart = Number(match[1]);
-      let unit = match[2] || '';
-
-      if (Number.isNaN(numericPart)) {
-        return { value: NaN, raw: normalized };
-      }
-
-      unit = unit.replace('µ', 'μ');
-
-      const unitMap = {
-        '': system === 'mm' ? 1e9 : 1e4,   // sem unidade: kN/mm² no sistema mm, N/cm² no sistema cm
-        'pa': 1,
-        'kpa': 1e3,
-        'mpa': 1e6,
-        'gpa': 1e9,
-        'tpa': 1e12,
-
-        'n/mm2': 1e6,
-        'n/cm2': 1e4,
-        'kn/mm2': 1e9,
-        'kn/cm2': 1e7
+      return {
+        value: parsed.value,
+        prefix: '',
+        raw: inputEl.value
       };
-
-      const lowerUnit = unit.toLowerCase();
-
-      if (unitMap[lowerUnit] !== undefined) {
-        return {
-          value: numericPart * unitMap[lowerUnit],
-          raw: normalized
-        };
-      }
-
-      const prefixOnly = unit.match(/^(da|[YZEPTGMkhdcmuμnpfazy])$/);
-      if (prefixOnly) {
-        const factor = PREFIX_FACTORS[unit];
-        return {
-          value: numericPart * factor,
-          raw: normalized
-        };
-      }
-
-      const paLike = unit.match(/^(da|[YZEPTGMkhdcmuμnpfazy])Pa$/i);
-      if (paLike) {
-        const prefix = unit.slice(0, unit.length - 2);
-        const factor = PREFIX_FACTORS[prefix];
-        if (factor !== undefined) {
-          return {
-            value: numericPart * factor,
-            raw: normalized
-          };
-        }
-      }
-
-      return { value: NaN, raw: normalized };
     }
 
     function calculate() {
       const parsedP = parseWithPrefix(els.p.value);
+      const parsedE = parseWithPrefix(els.e.value);
       const valL = parsePlainNumber(els.l.value);
       const valA = parsePlainNumber(els.a.value);
       const system = detectSystem(parsedP.prefix);
-      const parsedE = parseElasticModulus(els.e.value, system);
 
       updateUIForSystem(system);
 
@@ -466,7 +417,7 @@
       }
 
       if (Number.isNaN(parsedE.value) || parsedE.value <= 0) {
-        setError('Módulo E inválido. Exemplos: 210G, 210GPa, 210000MPa, 21e6, 210.');
+        setError('Módulo E inválido. Ex.: 210G, 200m, 500k');
         els.result.textContent = '...';
         return;
       }
@@ -487,7 +438,16 @@
       els.result.textContent = `${deltaMm.toFixed(6)} mm`;
     }
 
-    [els.p, els.l, els.e, els.a].forEach((input) => {
+    [els.p, els.e].forEach((input) => {
+      input.addEventListener('blur', () => {
+        normalizeInputValue(input);
+        calculate();
+      });
+
+      input.addEventListener('input', calculate);
+    });
+
+    [els.l, els.a].forEach((input) => {
       input.addEventListener('input', calculate);
     });
 

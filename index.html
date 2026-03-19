@@ -23,9 +23,7 @@
       --error-text: #b91c1c;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -41,7 +39,6 @@
     }
 
     .title {
-      margin: 8px 0 6px;
       text-align: center;
       font-size: 2rem;
       font-weight: 800;
@@ -57,14 +54,13 @@
       background: var(--card);
       border-radius: 20px;
       padding: 20px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     }
 
     .status {
       color: white;
       text-align: center;
       font-weight: 700;
-      font-size: 0.9rem;
       padding: 12px;
       border-radius: 12px;
       margin-bottom: 18px;
@@ -73,69 +69,32 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 1fr;
       gap: 16px;
     }
 
     .field label {
-      display: block;
       font-weight: 700;
-      color: #374151;
       margin-bottom: 6px;
-      font-size: 0.95rem;
+      display: block;
     }
 
     .input-with-unit {
       display: flex;
-      align-items: center;
       gap: 8px;
     }
 
-    .field input {
+    input {
       width: 100%;
       border: 1px solid var(--border);
-      background: #f9fafb;
       border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .field input:focus {
-      border-color: #93c5fd;
-      box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.25);
+      padding: 12px;
     }
 
     .unit-badge {
-      min-width: 64px;
-      text-align: center;
-      border: 1px solid var(--border);
-      background: #eef2ff;
-      color: #3730a3;
-      border-radius: 12px;
-      padding: 12px 10px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .hint {
-      margin-top: 6px;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .error {
-      display: none;
-      margin-top: 8px;
-      background: var(--error-bg);
-      border: 1px solid var(--error-border);
-      color: var(--error-text);
       padding: 12px;
+      background: #eef2ff;
       border-radius: 12px;
-      font-weight: 700;
-      font-size: 0.9rem;
+      font-weight: bold;
     }
 
     .result {
@@ -146,386 +105,133 @@
       text-align: center;
     }
 
-    .result-label {
-      color: #9ca3af;
-      font-size: 0.95rem;
-      margin-bottom: 8px;
-    }
-
     .result-value {
       color: var(--result);
       font-size: 2rem;
       font-weight: 800;
-      word-break: break-word;
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 18px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: var(--purple);
-      color: white;
-    }
-
-    .btn-secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-
-    .info {
-      margin-top: 20px;
-      background: var(--warn-bg);
-      border: 1px solid var(--warn-border);
-      border-radius: 14px;
-      padding: 16px;
-    }
-
-    .info h2 {
-      margin: 0 0 10px;
-      font-size: 1rem;
-      color: var(--warn-text);
-    }
-
-    .info ul {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--warn-text);
-      font-size: 0.92rem;
-      line-height: 1.5;
-    }
-
-    .footer {
-      text-align: center;
-      color: var(--muted);
-      margin-top: 18px;
-      font-size: 0.85rem;
-    }
-
-    @media (min-width: 680px) {
-      .grid.two {
-        grid-template-columns: 1fr 1fr;
-      }
     }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <h1 class="title">Calculadora ResMat</h1>
-    <p class="subtitle">Deformação axial pela fórmula δ = P·L / (E·A)</p>
 
-    <section class="card">
-      <div id="status" class="status">Sistema ativo: mm / mm² / kN</div>
+<main class="wrap">
+  <h1 class="title">Calculadora ResMat</h1>
+  <p class="subtitle">δ = P·L / (E·A)</p>
 
-      <div class="grid two">
-        <div class="field">
-          <label for="p">Carga P</label>
-          <div class="input-with-unit">
-            <input id="p" type="text" value="10k" placeholder="Ex.: 10k, 500, 2M" />
-            <span id="unitP" class="unit-badge">kN</span>
-          </div>
-          <div class="hint">Aceita prefixos SI como k, M, G, m, μ, da.</div>
-        </div>
+  <section class="card">
+    <div id="status" class="status"></div>
 
-        <div class="field">
-          <label for="e">Módulo E</label>
-          <div class="input-with-unit">
-            <input id="e" type="text" value="210G" placeholder="Ex.: 210G" />
-            <span id="unitE" class="unit-badge">Pa</span>
-          </div>
-          <div class="hint">Aceita prefixos SI como k, M, G, m, μ, da.</div>
+    <div class="grid">
+      <div class="field">
+        <label>Carga P</label>
+        <div class="input-with-unit">
+          <input id="p" value="10k">
+          <span id="unitP" class="unit-badge"></span>
         </div>
       </div>
 
-      <div class="grid two" style="margin-top: 2px;">
-        <div class="field">
-          <label for="l" id="labelL">Comprimento L</label>
-          <div class="input-with-unit">
-            <input id="l" type="number" step="any" value="150" placeholder="Ex.: 150" />
-            <span id="unitL" class="unit-badge">mm</span>
-          </div>
-          <div class="hint" id="hintL">Informe L em mm</div>
-        </div>
-
-        <div class="field">
-          <label for="a" id="labelA">Área A</label>
-          <div class="input-with-unit">
-            <input id="a" type="number" step="any" value="25" placeholder="Ex.: 25" />
-            <span id="unitA" class="unit-badge">mm²</span>
-          </div>
-          <div class="hint" id="hintA">Informe A em mm²</div>
+      <div class="field">
+        <label>Módulo E</label>
+        <div class="input-with-unit">
+          <input id="e" value="210G">
+          <span class="unit-badge">Pa</span>
         </div>
       </div>
 
-      <div id="error" class="error"></div>
-
-      <div class="result">
-        <div class="result-label">Deformação (δ)</div>
-        <div id="result" class="result-value">...</div>
+      <div class="field">
+        <label>Comprimento L</label>
+        <div class="input-with-unit">
+          <input id="l" value="150">
+          <span id="unitL" class="unit-badge"></span>
+        </div>
       </div>
 
-      <div class="actions">
-        <button class="btn-primary" id="copyBtn">Copiar resultado</button>
-        <button class="btn-secondary" id="clearBtn">Limpar</button>
+      <div class="field">
+        <label>Área A</label>
+        <div class="input-with-unit">
+          <input id="a" value="25">
+          <span id="unitA" class="unit-badge"></span>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <section class="info">
-      <h2>Observações</h2>
-      <ul>
-        <li><strong>m</strong> (mili) é diferente de <strong>M</strong> (mega).</li>
-        <li>Apenas <strong>k</strong> minúsculo na carga ativa o sistema em <strong>mm / mm² / kN</strong>.</li>
-        <li>O resultado final é sempre exibido em <strong>mm</strong>.</li>
-        <li>Você pode usar vírgula ou ponto decimal.</li>
-        <li>Ao sair do campo <strong>P</strong> ou <strong>E</strong>, valores com prefixo são convertidos automaticamente.</li>
-      </ul>
-    </section>
+    <div class="result">
+      <div id="result" class="result-value">...</div>
+    </div>
+  </section>
+</main>
 
-    <p class="footer">André Gonçalves da Silva - RA: 197590.</p>
-  </main>
+<script>
+const PREFIX = {
+  k: 1e3, M: 1e6, G: 1e9,
+  m: 1e-3, u: 1e-6, μ: 1e-6
+};
 
-  <script>
-    const PREFIX_FACTORS = {
-      Y: 1e24,
-      Z: 1e21,
-      E: 1e18,
-      P: 1e15,
-      T: 1e12,
-      G: 1e9,
-      M: 1e6,
-      k: 1e3,
-      h: 1e2,
-      da: 1e1,
-      d: 1e-1,
-      c: 1e-2,
-      m: 1e-3,
-      u: 1e-6,
-      μ: 1e-6,
-      n: 1e-9,
-      p: 1e-12,
-      f: 1e-15,
-      a: 1e-18,
-      z: 1e-21,
-      y: 1e-24
-    };
+const els = {
+  p: document.getElementById('p'),
+  e: document.getElementById('e'),
+  l: document.getElementById('l'),
+  a: document.getElementById('a'),
+  unitP: document.getElementById('unitP'),
+  unitL: document.getElementById('unitL'),
+  unitA: document.getElementById('unitA'),
+  status: document.getElementById('status'),
+  result: document.getElementById('result')
+};
 
-    const els = {
-      p: document.getElementById('p'),
-      l: document.getElementById('l'),
-      e: document.getElementById('e'),
-      a: document.getElementById('a'),
-      status: document.getElementById('status'),
-      labelL: document.getElementById('labelL'),
-      labelA: document.getElementById('labelA'),
-      hintL: document.getElementById('hintL'),
-      hintA: document.getElementById('hintA'),
-      unitP: document.getElementById('unitP'),
-      unitE: document.getElementById('unitE'),
-      unitL: document.getElementById('unitL'),
-      unitA: document.getElementById('unitA'),
-      error: document.getElementById('error'),
-      result: document.getElementById('result'),
-      clearBtn: document.getElementById('clearBtn'),
-      copyBtn: document.getElementById('copyBtn')
-    };
+function parse(input) {
+  const match = input.replace(',', '.').match(/^([\d.]+)([a-zA-Zμ]*)$/);
+  if (!match) return NaN;
 
-    function parseWithPrefix(input) {
-      if (!input || !input.trim()) {
-        return { value: NaN, prefix: '', raw: '' };
-      }
+  let value = parseFloat(match[1]);
+  const prefix = match[2];
 
-      const normalized = input.trim().replace(',', '.').replace(/\s+/g, '');
-      const match = normalized.match(/^([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(da|[YZEPTGMkhdcmuμnpfazy])?$/);
+  if (PREFIX[prefix]) value *= PREFIX[prefix];
 
-      if (!match) {
-        return { value: NaN, prefix: '', raw: normalized };
-      }
+  return { value, prefix };
+}
 
-      const numericPart = Number(match[1]);
-      const suffix = match[2] || '';
-      const factor = suffix === '' ? 1 : PREFIX_FACTORS[suffix];
+function detectSystem(prefix) {
+  return prefix === 'k' ? 'cm' : 'mm';
+}
 
-      if (Number.isNaN(numericPart) || factor === undefined) {
-        return { value: NaN, prefix: '', raw: normalized };
-      }
+function updateUI(system) {
+  const isMm = system === 'mm';
 
-      return {
-        value: numericPart * factor,
-        prefix: suffix,
-        raw: normalized
-      };
-    }
+  els.unitP.textContent = isMm ? 'N' : 'kN';
+  els.unitL.textContent = isMm ? 'mm' : 'cm';
+  els.unitA.textContent = isMm ? 'mm²' : 'cm²';
 
-    function parsePlainNumber(input) {
-      if (!input || !input.trim()) return NaN;
-      return Number(input.trim().replace(',', '.'));
-    }
+  els.status.textContent = isMm
+    ? 'Sistema: mm / mm² / N'
+    : 'Sistema: cm / cm² / kN';
+}
 
-    function detectSystem(loadPrefix) {
-      return loadPrefix === 'k' ? 'mm' : 'cm';
-    }
+function calculate() {
+  const p = parse(els.p.value);
+  const e = parse(els.e.value);
+  const l = parseFloat(els.l.value);
+  const a = parseFloat(els.a.value);
 
-    function setError(message) {
-      if (message) {
-        els.error.textContent = message;
-        els.error.style.display = 'block';
-      } else {
-        els.error.textContent = '';
-        els.error.style.display = 'none';
-      }
-    }
+  if (!p || !e || !l || !a) return;
 
-    function formatNumberBR(value) {
-      return value
-        .toFixed(12)
-        .replace(/\.?0+$/, '')
-        .replace('.', ',');
-    }
+  const system = detectSystem(p.prefix);
+  updateUI(system);
 
-    function normalizeInputValue(inputEl) {
-      const parsed = parseWithPrefix(inputEl.value);
+  const L = system === 'mm' ? l * 1e-3 : l * 1e-2;
+  const A = system === 'mm' ? a * 1e-6 : a * 1e-4;
 
-      if (!inputEl.value || Number.isNaN(parsed.value) || !parsed.prefix) {
-        return parsed;
-      }
+  const delta = (p.value * L) / (e.value * A);
 
-      inputEl.value = formatNumberBR(parsed.value);
+  els.result.textContent = (delta * 1000).toFixed(6) + ' mm';
+}
 
-      return {
-        value: parsed.value,
-        prefix: '',
-        raw: inputEl.value
-      };
-    }
+document.querySelectorAll('input').forEach(i =>
+  i.addEventListener('input', calculate)
+);
 
-    function updateUIForSystem(system) {
-      const isMm = system === 'mm';
+calculate();
+</script>
 
-      els.status.textContent = isMm
-        ? 'Sistema ativo: mm / mm² / kN'
-        : 'Sistema ativo: cm / cm² / N';
-
-      els.status.style.background = isMm ? '#16a34a' : '#4f46e5';
-
-      els.labelL.textContent = 'Comprimento L';
-      els.labelA.textContent = 'Área A';
-
-      els.hintL.textContent = `Informe L em ${isMm ? 'mm' : 'cm'}`;
-      els.hintA.textContent = `Informe A em ${isMm ? 'mm²' : 'cm²'}`;
-
-      els.l.placeholder = isMm ? 'Ex.: 1500' : 'Ex.: 150';
-      els.a.placeholder = isMm ? 'Ex.: 250' : 'Ex.: 25';
-
-      els.unitP.textContent = isMm ? 'kN' : 'N';
-      els.unitE.textContent = 'Pa';
-      els.unitL.textContent = isMm ? 'mm' : 'cm';
-      els.unitA.textContent = isMm ? 'mm²' : 'cm²';
-    }
-
-    function calculate() {
-      const parsedP = parseWithPrefix(els.p.value);
-      const parsedE = parseWithPrefix(els.e.value);
-      const valL = parsePlainNumber(els.l.value);
-      const valA = parsePlainNumber(els.a.value);
-      const system = detectSystem(parsedP.prefix);
-
-      updateUIForSystem(system);
-
-      if (!els.p.value && !els.l.value && !els.e.value && !els.a.value) {
-        setError('');
-        els.result.textContent = '...';
-        return;
-      }
-
-      if (Number.isNaN(parsedP.value)) {
-        setError('Carga inválida. Ex.: 10k, 500, 2M');
-        els.result.textContent = '...';
-        return;
-      }
-
-      if (Number.isNaN(valL) || valL <= 0) {
-        setError(`Comprimento L inválido em ${system === 'mm' ? 'mm' : 'cm'}.`);
-        els.result.textContent = '...';
-        return;
-      }
-
-      if (Number.isNaN(parsedE.value) || parsedE.value <= 0) {
-        setError('Módulo E inválido. Ex.: 210G, 200m, 500k');
-        els.result.textContent = '...';
-        return;
-      }
-
-      if (Number.isNaN(valA) || valA <= 0) {
-        setError(`Área A inválida em ${system === 'mm' ? 'mm²' : 'cm²'}.`);
-        els.result.textContent = '...';
-        return;
-      }
-
-      setError('');
-
-      const L_SI = system === 'mm' ? valL * 1e-3 : valL * 1e-2;
-      const A_SI = system === 'mm' ? valA * 1e-6 : valA * 1e-4;
-      const deltaMeters = (parsedP.value * L_SI) / (parsedE.value * A_SI);
-      const deltaMm = deltaMeters * 1000;
-
-      els.result.textContent = `${deltaMm.toFixed(6)} mm`;
-    }
-
-    [els.p, els.e].forEach((input) => {
-      input.addEventListener('blur', () => {
-        normalizeInputValue(input);
-        calculate();
-      });
-
-      input.addEventListener('input', calculate);
-    });
-
-    [els.l, els.a].forEach((input) => {
-      input.addEventListener('input', calculate);
-    });
-
-    els.clearBtn.addEventListener('click', () => {
-      els.p.value = '10k';
-      els.e.value = '210G';
-      els.l.value = '150';
-      els.a.value = '25';
-      calculate();
-      els.p.focus();
-    });
-
-    els.copyBtn.addEventListener('click', async () => {
-      const text = els.result.textContent;
-      if (!text || text === '...') return;
-
-      try {
-        await navigator.clipboard.writeText(text);
-        const original = els.copyBtn.textContent;
-        els.copyBtn.textContent = 'Resultado copiado';
-        setTimeout(() => {
-          els.copyBtn.textContent = original;
-        }, 1600);
-      } catch {
-        const original = els.copyBtn.textContent;
-        els.copyBtn.textContent = 'Não foi possível copiar';
-        setTimeout(() => {
-          els.copyBtn.textContent = original;
-        }, 1600);
-      }
-    });
-
-    calculate();
-  </script>
 </body>
 </html>
